@@ -713,7 +713,7 @@ export async function fetchRecentOutputs(limitPerAgent = 5): Promise<GeneratedRe
     .slice(0, 20);
 }
 
-export async function fetchPendingThemes(): Promise<Tema[]> {
+export async function listPendingThemes(): Promise<Tema[]> {
   const { data, error } = await supabase
     .from("temas")
     .select("*")

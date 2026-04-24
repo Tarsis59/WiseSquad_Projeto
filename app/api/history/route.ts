@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 
-import { fetchPendingThemes, fetchRecentOutputs } from "@/lib/generate";
+import { listPendingThemes, fetchRecentOutputs } from "@/lib/generate";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const [outputs, themes] = await Promise.all([fetchRecentOutputs(), fetchPendingThemes()]);
+    const [outputs, themes] = await Promise.all([fetchRecentOutputs(), listPendingThemes()]);
 
     return NextResponse.json({
       success: true,
