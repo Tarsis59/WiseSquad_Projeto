@@ -713,6 +713,20 @@ export async function fetchRecentOutputs(limitPerAgent = 5): Promise<GeneratedRe
     .slice(0, 20);
 }
 
+export async function fetchPendingThemes(): Promise<Tema[]> {
+  const { data, error } = await supabase
+    .from("temas")
+    .select("*")
+    .eq("status", "pendente")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(`Erro ao buscar temas pendentes: ${error.message}`);
+  }
+
+  return (data ?? []) as Tema[];
+}
+
 export async function syncAllThemesStatus() {
   console.log("[wisesquad.sync] Iniciando sincronização global de status dos temas...");
   
