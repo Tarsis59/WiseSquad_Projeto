@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Clock3, Copy, Pencil, ExternalLink, Search, Filter } from "lucide-react";
+import { Clock3, Copy, Pencil, ExternalLink, Search, Filter, Trash2, Image as ImageIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ interface RecentOutputProps {
   onCopy: (text: string) => void;
   onUpdate: (id: string, agent: string, content: string) => Promise<void>;
   onGenerateImage?: (agent: string, temaId: string) => Promise<void>;
+  onDeleteImage?: (id: string, agent: string) => Promise<void>;
+  onDeleteContent?: (id: string, agent: string) => Promise<void>;
   loadingImageAgent?: string | null;
 }
 
@@ -40,7 +42,15 @@ const agentColors: Record<AgentType, string> = {
   substack: "bg-slate-50 text-slate-700 border-slate-200",
 };
 
-export function RecentOutput({ outputs, onCopy, onUpdate, onGenerateImage, loadingImageAgent }: RecentOutputProps) {
+export function RecentOutput({ 
+  outputs, 
+  onCopy, 
+  onUpdate, 
+  onGenerateImage, 
+  onDeleteImage, 
+  onDeleteContent, 
+  loadingImageAgent 
+}: RecentOutputProps) {
   const [activeTab, setActiveTab] = useState<TabId>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [editingOutput, setEditingOutput] = useState<GeneratedRecord | null>(null);
@@ -151,17 +161,47 @@ export function RecentOutput({ outputs, onCopy, onUpdate, onGenerateImage, loadi
                   <div className="h-4 w-px bg-slate-200" />
                   <span className="text-[10px] font-bold text-slate-400">{formatDateTime(output.created_at)}</span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 rounded-xl opacity-0 group-hover:opacity-100 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-all"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setEditingOutput(output);
-                  }}
-                >
-                  <Pencil className="size-3.5" />
-                </Button>
+                <div className="flex items-center gap-1">
+                  {(output.media_url || output.imagem_url || output.thumbnail_url) && onDeleteImage && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 rounded-xl opacity-0 group-hover:opacity-100 bg-slate-50 hover:bg-red-50 hover:text-red-600 transition-all"
+                      title="Apagar Imagem"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteImage(output.id, output.agent);
+                      }}
+                    >
+                      <ImageIcon className="size-3.5" />
+                    </Button>
+                  )}
+                  {onDeleteContent && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 rounded-xl opacity-0 group-hover:opacity-100 bg-slate-50 hover:bg-red-50 hover:text-red-600 transition-all"
+                      title="Apagar Conteúdo"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteContent(output.id, output.agent);
+                      }}
+                    >
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 rounded-xl opacity-0 group-hover:opacity-100 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-all"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingOutput(output);
+                    }}
+                  >
+                    <Pencil className="size-3.5" />
+                  </Button>
+                </div>
               </div>
               
               <h3 className="text-sm font-bold text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
@@ -169,7 +209,7 @@ export function RecentOutput({ outputs, onCopy, onUpdate, onGenerateImage, loadi
               </h3>
               <p className="mt-1 text-[9px] text-slate-400 font-bold uppercase tracking-wider">REF: {output.tema_id}</p>
               
-              {output.media_url !== undefined ? (
+              {output.media_url !== undefined && output.media_url !== null ? (
                 <div className="mt-3 overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
                   <ImageWithSkeleton
                     alt={`Capa de ${output.titulo}`}
@@ -231,10 +271,10 @@ export function RecentOutput({ outputs, onCopy, onUpdate, onGenerateImage, loadi
         output={editingOutput}
         onSave={onUpdate}
         onGenerateImage={onGenerateImage}
+        onDeleteImage={onDeleteImage}
+        onDeleteContent={onDeleteContent}
         isGeneratingImage={loadingImageAgent === editingOutput?.agent}
       />
     </div>
   );
 }
-
-

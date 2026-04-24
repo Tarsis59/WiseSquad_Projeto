@@ -14,6 +14,7 @@ export async function PUT(request: Request) {
       agent?: AgentType;
       recordId?: string;
       conteudo?: string;
+      status?: string;
     };
 
     const agent = body.agent;
@@ -37,10 +38,20 @@ export async function PUT(request: Request) {
       return NextResponse.json({ success: false, message: "Configuração do agente não encontrada." }, { status: 400 });
     }
 
+    let finalConteudo = conteudo;
+    if (body.status === "confirmed" && finalConteudo && !finalConteudo.includes("[CONFIRMED]")) {
+      finalConteudo = finalConteudo + "\n\n[CONFIRMED]";
+    } else if (body.status === "draft" && finalConteudo) {
+      finalConteudo = finalConteudo.replace(/\n\n\[CONFIRMED\]/g, "").replace(/\[CONFIRMED\]/g, "");
+    }
+
     // Atualizar o conteúdo no banco
+    const updateData: any = {};
+    if (finalConteudo) updateData.conteudo = finalConteudo;
+
     const { error } = await supabase
       .from(config.table)
-      .update({ conteudo })
+      .update(updateData)
       .eq("id", recordId);
 
     if (error) {

@@ -18,6 +18,7 @@ export interface GeneratedRecord {
   media_url?: string | null;
   created_at?: string | null;
   agent: AgentType;
+  status?: "draft" | "confirmed" | string | null;
 }
 
 export interface CustomAgent {

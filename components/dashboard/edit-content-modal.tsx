@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Save, Loader2, Maximize2, Minimize2, Image as ImageIcon } from "lucide-react";
+import { X, Save, Loader2, Maximize2, Minimize2, Image as ImageIcon, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { GeneratedRecord } from "@/lib/types";
 
@@ -12,6 +12,8 @@ interface EditContentModalProps {
   output: GeneratedRecord | null;
   onSave: (id: string, agent: string, content: string) => Promise<void>;
   onGenerateImage?: (agent: string, temaId: string) => Promise<void>;
+  onDeleteImage?: (id: string, agent: string) => Promise<void>;
+  onDeleteContent?: (id: string, agent: string) => Promise<void>;
   isGeneratingImage?: boolean;
 }
 
@@ -21,6 +23,8 @@ export function EditContentModal({
   output, 
   onSave,
   onGenerateImage,
+  onDeleteImage,
+  onDeleteContent,
   isGeneratingImage 
 }: EditContentModalProps) {
   const [content, setContent] = useState("");
@@ -138,23 +142,36 @@ export function EditContentModal({
               {/* Footer */}
               <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-6 py-4">
                 <div>
-                  {onGenerateImage && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-2 rounded-xl bg-white text-blue-600 border-blue-100 hover:bg-blue-50"
-                      onClick={() => output && onGenerateImage(output.agent, output.tema_id)}
-                      disabled={isGeneratingImage}
-                    >
-                      {isGeneratingImage ? <Loader2 className="size-4 animate-spin" /> : <ImageIcon className="size-4" />}
-                      Gerar Nova Imagem
-                    </Button>
-                  )}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 rounded-xl bg-white text-blue-600 border-blue-100 hover:bg-blue-50"
+                        onClick={() => output && onGenerateImage?.(output.agent, output.tema_id)}
+                        disabled={isGeneratingImage}
+                      >
+                        {isGeneratingImage ? <Loader2 className="size-4 animate-spin" /> : <ImageIcon className="size-4" />}
+                        Gerar Nova Imagem
+                      </Button>
+                    </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <Button variant="ghost" onClick={onClose} disabled={isSaving}>
                     Cancelar
                   </Button>
+                  {onDeleteContent && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-10 rounded-xl p-0 hover:bg-red-50 hover:text-red-600 text-slate-400"
+                      onClick={() => {
+                        onDeleteContent?.(output.id, output.agent);
+                        onClose();
+                      }}
+                    >
+                      <Trash2 className="size-5" />
+                    </Button>
+                  )}
                   <Button 
                     onClick={handleSave} 
                     disabled={isSaving || content === output.conteudo}

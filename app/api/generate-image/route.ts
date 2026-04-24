@@ -87,3 +87,33 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const agent = searchParams.get("agent") as AgentType;
+    const recordId = searchParams.get("recordId");
+
+    if (!agent || !validAgents.includes(agent) || !recordId) {
+      return NextResponse.json({ success: false, message: "Parâmetros inválidos." }, { status: 400 });
+    }
+
+    const config = agentConfigs[agent];
+    const updateFields = agent === "youtube" 
+      ? { thumbnail_url: null } 
+      : { imagem_url: null, media_url: null };
+
+    const { error } = await supabase
+      .from(config.table)
+      .update(updateFields)
+      .eq("id", recordId);
+
+    if (error) {
+      return NextResponse.json({ success: false, message: "Erro ao remover imagem." }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, message: "Imagem removida com sucesso." });
+  } catch (error) {
+    return NextResponse.json({ success: false, message: "Erro interno." }, { status: 500 });
+  }
+}

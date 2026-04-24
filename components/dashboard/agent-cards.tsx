@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Briefcase, Check, Clapperboard, FileText, Film, Image, Loader2, Newspaper, Pencil, Play } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -57,6 +58,7 @@ interface AgentCardsProps {
   loadingImageAgent: AgentType | null;
   onRun: (agent: AgentType) => void;
   onGenerateImage: (agent: AgentType) => void;
+  onConfirm?: (agent: AgentType, id: string, content: string) => void;
   allDisabled?: boolean;
   outputs: Record<AgentType, GeneratedRecord | null>;
   selectedThemeId?: string | null;
@@ -67,6 +69,7 @@ export function AgentCards({
   loadingImageAgent,
   onRun,
   onGenerateImage,
+  onConfirm,
   allDisabled = false,
   outputs,
   selectedThemeId,
@@ -111,16 +114,46 @@ export function AgentCards({
                       <Icon className="size-6" />
                     )}
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-2">
                     {hasText && (
-                      <div className="flex size-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                        <Check className="size-3.5" />
-                      </div>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-7 rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-all active:scale-90"
+                        title="Confirmar"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (output && onConfirm) {
+                            onConfirm(agent.id, output.id, output.conteudo);
+                          } else {
+                             toast.success(`${agent.title} confirmado!`);
+                          }
+                        }}
+                      >
+                        <Check className={cn("size-4 font-black", output?.status === "confirmed" && "scale-125")} />
+                      </Button>
                     )}
-                    {hasImage && (
-                      <div className="flex size-6 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                        <Image className="size-3.5" />
-                      </div>
+                    {hasText && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className={cn(
+                          "size-7 rounded-full transition-all active:scale-90",
+                          hasImage ? "bg-blue-100 text-blue-600 hover:bg-blue-200" : "bg-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-500"
+                        )}
+                        title={hasImage ? "Gerar Nova Imagem" : "Gerar Imagem"}
+                        disabled={isImageLoading}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onGenerateImage(agent.id);
+                        }}
+                      >
+                        {isImageLoading ? (
+                          <Loader2 className="size-3.5 animate-spin" />
+                        ) : (
+                          <Image className="size-3.5" />
+                        )}
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -147,7 +180,7 @@ export function AgentCards({
                 </div>
               )}
 
-              {hasText && (
+              {hasText && output?.status !== "confirmed" && (
                 <div className="flex gap-2 mt-auto pt-4">
                   <Link
                     href={`/edit/${agent.id}/${output?.id}`}
@@ -168,7 +201,7 @@ export function AgentCards({
                     </Button>
                   </Link>
 
-                  {!hasImage ? (
+                  {!hasImage && (
                     <Button
                       size="sm"
                       variant="default"
@@ -185,16 +218,6 @@ export function AgentCards({
                         <Image className="size-3.5" />
                       )}
                       <span className="text-xs font-semibold">Gerar Imagem</span>
-                    </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="flex-1 gap-2 rounded-xl h-10 bg-slate-100 text-slate-500 border-none"
-                      disabled={true}
-                    >
-                      <Check className="size-3.5" />
-                      <span className="text-xs font-semibold">Imagem OK</span>
                     </Button>
                   )}
                 </div>

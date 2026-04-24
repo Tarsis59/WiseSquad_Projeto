@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { CheckCircle2, ChevronLeft, Copy, Image as ImageIcon, Loader2, Pencil, Trash2, Wand2, WandSparkles } from "lucide-react";
 import { marked } from "marked";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -179,6 +180,34 @@ export function ThemeDetailContent({ initialTema, initialOutputs }: ThemeDetailC
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao atualizar conteúdo.", { id: toastId });
       throw error;
+    }
+  }
+  
+  async function handleDeleteImage(recordId: string, agent: string) {
+    if (!confirm("Deseja remover esta imagem?")) return;
+    const toastId = toast.loading("Removendo imagem...");
+
+    try {
+      const response = await fetch(`/api/generate-image?recordId=${recordId}&agent=${agent}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.message ?? "Erro ao remover imagem.");
+      }
+
+      setOutputs((prev) => {
+        const list = prev[agent] ?? [];
+        return {
+          ...prev,
+          [agent]: list.map((o) => (o.id === recordId ? { ...o, imagem_url: null, media_url: null, thumbnail_url: null } : o)),
+        };
+      });
+
+      toast.success("Imagem removida com sucesso!", { id: toastId });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao remover imagem.", { id: toastId });
     }
   }
 
@@ -409,13 +438,15 @@ export function ThemeDetailContent({ initialTema, initialOutputs }: ThemeDetailC
                       <div className="p-6 space-y-4 bg-white/50">
                         {hasImage && (
                           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 group relative">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              alt={`Capa ${label}`}
-                              className="max-h-[300px] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            <Image
                               src={output.media_url || output.imagem_url || output.thumbnail_url || ""}
+                              alt={`Capa ${label}`}
+                              width={1024}
+                              height={512}
+                              className="max-h-[300px] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              priority={index === 0}
                             />
-                            <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                               <Button 
                                 variant="secondary" 
                                 size="sm" 
@@ -424,7 +455,15 @@ export function ThemeDetailContent({ initialTema, initialOutputs }: ThemeDetailC
                                 disabled={isGeneratingImage}
                               >
                                 {isGeneratingImage ? <Loader2 className="size-3.5 animate-spin" /> : <ImageIcon className="size-3.5" />}
-                                Substituir Imagem
+                                Substituir
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="size-8 rounded-full bg-red-600 text-white hover:bg-red-700 hover:text-white"
+                                onClick={() => handleDeleteImage(output.id, agent)}
+                              >
+                                <Trash2 className="size-3.5" />
                               </Button>
                             </div>
                           </div>
@@ -469,6 +508,7 @@ export function ThemeDetailContent({ initialTema, initialOutputs }: ThemeDetailC
         onClose={() => setEditingOutput(null)}
         output={editingOutput}
         onSave={handleUpdateContent}
+        onDeleteImage={handleDeleteImage}
       />
     </div>
   );

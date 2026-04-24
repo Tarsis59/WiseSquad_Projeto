@@ -237,6 +237,32 @@ export function DashboardShell({ initialThemes, initialOutputs }: DashboardShell
     }
   }
 
+  async function handleConfirmContent(agent: string, id: string, content: string) {
+    const toastId = toast.loading("Confirmando...");
+    try {
+      const response = await fetch("/api/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recordId: id, agent, conteudo: content, status: "confirmed" }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message ?? "Erro ao confirmar.");
+
+      const updatedContent = content.includes("[CONFIRMED]") ? content : content + "\n\n[CONFIRMED]";
+      
+      setRecentOutputs((prev) => prev.map((o) => (o.id === id ? { ...o, conteudo: updatedContent, status: "confirmed" } : o)));
+      if (currentOutput?.id === id) setCurrentOutput((prev) => (prev ? { ...prev, conteudo: updatedContent, status: "confirmed" } : null));
+      setOutputsByAgent((prev) => {
+        const existing = prev[agent as AgentType];
+        if (existing?.id === id) return { ...prev, [agent]: { ...existing, conteudo: updatedContent, status: "confirmed" } };
+        return prev;
+      });
+      toast.success("Conteúdo confirmado com sucesso!", { id: toastId });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao confirmar.", { id: toastId });
+    }
+  }
+
   async function handleCopy(text: string) {
     try {
       await navigator.clipboard.writeText(text);
@@ -258,6 +284,13 @@ export function DashboardShell({ initialThemes, initialOutputs }: DashboardShell
       });
       const data = (await response.json()) as { success: boolean; imageUrl?: string; message?: string };
       if (!response.ok || !data.success) throw new Error(data.message ?? "Erro ao gerar imagem.");
+      
+      const updateData = {
+        media_url: data.imageUrl,
+        imagem_url: agent === "youtube" ? undefined : data.imageUrl,
+        thumbnail_url: agent === "youtube" ? data.imageUrl : undefined,
+      };
+
       setOutputsByAgent((prev) => {
         const existing = prev[agent];
         if (existing) {
@@ -265,19 +298,96 @@ export function DashboardShell({ initialThemes, initialOutputs }: DashboardShell
             ...prev,
             [agent]: {
               ...existing,
-              media_url: data.imageUrl ?? existing.media_url,
-              imagem_url: agent === "youtube" ? existing.imagem_url : data.imageUrl,
-              thumbnail_url: agent === "youtube" ? data.imageUrl : existing.thumbnail_url,
+              ...updateData
             },
           };
         }
         return prev;
       });
+
+      setRecentOutputs((prev) => prev.map(o => {
+        if (o.agent === agent && o.tema_id === selectedTheme.id) {
+          return { ...o, ...updateData };
+        }
+        return o;
+      }));
+
+      if (currentOutput?.agent === agent && currentOutput.tema_id === selectedTheme.id) {
+        setCurrentOutput(prev => prev ? { ...prev, ...updateData } : null);
+      }
+
       toast.success("Imagem gerada com sucesso!", { id: toastId });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao gerar imagem.", { id: toastId });
     } finally {
       setLoadingImageAgent(null);
+    }
+  }
+
+  async function handleDeleteImage(recordId: string, agent: string) {
+    if (!confirm("Deseja remover esta imagem?")) return;
+    const toastId = toast.loading("Removendo imagem...");
+    try {
+      const response = await fetch(`/api/generate-image?recordId=${recordId}&agent=${agent}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message ?? "Erro ao remover imagem.");
+
+      const clearData = {
+        media_url: null,
+        imagem_url: null,
+        thumbnail_url: null,
+      };
+
+      setRecentOutputs((prev) => prev.map((o) => (o.id === recordId ? { ...o, ...clearData } : o)));
+      if (currentOutput?.id === recordId) setCurrentOutput((prev) => (prev ? { ...prev, ...clearData } : null));
+      setOutputsByAgent((prev) => {
+        const existing = prev[agent as AgentType];
+        if (existing?.id === recordId) return { ...prev, [agent]: { ...existing, ...clearData } };
+        return prev;
+      });
+
+      toast.success("Imagem removida com sucesso!", { id: toastId });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao remover imagem.", { id: toastId });
+    }
+  }
+
+  async function handleDeleteContent(id: string, agent: string) {
+    if (!confirm("Tem certeza que deseja excluir todo este conteúdo (texto e imagem)?")) return;
+    const toastId = toast.loading("Excluindo conteúdo...");
+    try {
+      const response = await fetch(`/api/content?recordId=${id}&agent=${agent}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message ?? "Erro ao excluir conteúdo.");
+
+      setRecentOutputs((prev) => prev.filter((o) => o.id !== id));
+      if (currentOutput?.id === id) setCurrentOutput(null);
+      setOutputsByAgent((prev) => {
+        if (prev[agent as AgentType]?.id === id) {
+          const next = { ...prev };
+          delete next[agent as AgentType];
+          return next;
+        }
+        return prev;
+      });
+
+      // Atualizar contagem no tema
+      if (selectedTheme) {
+        setThemes((prev) => prev.map((t) => {
+          if (t.id === selectedTheme.id) {
+            return { ...t, completed_count: Math.max(0, (t.completed_count ?? 0) - 1) };
+          }
+          return t;
+        }));
+      }
+
+      toast.success("Conteúdo excluído com sucesso!", { id: toastId });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao excluir.", { id: toastId });
     }
   }
 
@@ -376,6 +486,7 @@ export function DashboardShell({ initialThemes, initialOutputs }: DashboardShell
                   loadingImageAgent={loadingImageAgent}
                   onRun={handleRun}
                   onGenerateImage={handleGenerateImage}
+                  onConfirm={handleConfirmContent}
                   allDisabled={runningAll}
                   outputs={outputsByAgent}
                   selectedThemeId={selectedTheme?.id}
@@ -401,6 +512,8 @@ export function DashboardShell({ initialThemes, initialOutputs }: DashboardShell
                 if (idx < recentOutputs.length - 1) setCurrentOutput(recentOutputs[idx + 1]);
               }}
               onGenerateImage={handleGenerateImage}
+              onDeleteImage={handleDeleteImage}
+              onDeleteContent={handleDeleteContent}
               loadingImageAgent={loadingImageAgent}
             />
           </div>
@@ -411,6 +524,8 @@ export function DashboardShell({ initialThemes, initialOutputs }: DashboardShell
             onUpdate={handleUpdateContent} 
             outputs={recentOutputs} 
             onGenerateImage={handleGenerateImage}
+            onDeleteImage={handleDeleteImage}
+            onDeleteContent={handleDeleteContent}
             loadingImageAgent={loadingImageAgent}
           />
         </div>

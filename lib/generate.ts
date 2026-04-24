@@ -59,11 +59,12 @@ export function normalizeRecord(agent: AgentType, row: Record<string, unknown>):
     tema_id: String(row.tema_id ?? ""),
     titulo: String(row.titulo ?? ""),
     conteudo: String(row.conteudo ?? ""),
-    imagem_url: imagemUrl,
+    imagem_url: imagemUrl || thumbnailUrl,
     thumbnail_url: thumbnailUrl,
-    media_url: imagemUrl ?? thumbnailUrl,
-    created_at: typeof row.created_at === "string" ? row.created_at : null,
-    agent,
+    media_url: imagemUrl || thumbnailUrl,
+    created_at: row.created_at ? String(row.created_at) : null,
+    agent: agent as AgentType,
+    status: (row.conteudo && String(row.conteudo).includes("[CONFIRMED]")) ? "confirmed" : "draft",
   };
 }
 

@@ -1,17 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Copy, Loader2, Sparkles, Pencil, ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Copy, Image as ImageIcon, Loader2, Pencil, Sparkles, Trash2 } from "lucide-react";
 import { marked } from "marked";
+import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ImageWithSkeleton } from "@/components/ui/image-with-skeleton";
 import type { GeneratedRecord, Tema } from "@/lib/types";
-import { cn } from "@/lib/utils";
-import { formatDateTime } from "@/lib/utils";
+import { cn, formatDateTime } from "@/lib/utils";
 import { EditContentModal } from "./edit-content-modal";
 
 marked.setOptions({ breaks: true, gfm: true });
@@ -29,6 +28,8 @@ interface ContentDisplayProps {
   currentIndex?: number;
   totalItems?: number;
   onGenerateImage?: (agent: string, temaId: string) => Promise<void>;
+  onDeleteImage?: (id: string, agent: string) => Promise<void>;
+  onDeleteContent?: (id: string, agent: string) => Promise<void>;
   loadingImageAgent?: string | null;
 }
 
@@ -45,6 +46,8 @@ export function ContentDisplay({
   currentIndex,
   totalItems,
   onGenerateImage,
+  onDeleteImage,
+  onDeleteContent,
   loadingImageAgent,
 }: ContentDisplayProps) {
   const [copied, setCopied] = useState(false);
@@ -147,6 +150,30 @@ export function ContentDisplay({
                     )}
                     Gerar Imagem
                   </Button>
+
+                  {currentOutput && (currentOutput.media_url || currentOutput.imagem_url || currentOutput.thumbnail_url) && onDeleteImage && (
+                    <Button
+                      onClick={() => onDeleteImage(currentOutput.id, currentOutput.agent)}
+                      size="sm"
+                      variant="ghost"
+                      className="size-12 rounded-2xl text-slate-400 hover:bg-red-50 hover:text-red-600 transition-all active:scale-95"
+                      title="Apagar Imagem"
+                    >
+                      <ImageIcon className="size-5" />
+                    </Button>
+                  )}
+
+                  {currentOutput && onDeleteContent && (
+                    <Button
+                      onClick={() => onDeleteContent(currentOutput.id, currentOutput.agent)}
+                      size="sm"
+                      variant="ghost"
+                      className="size-12 rounded-2xl text-slate-400 hover:bg-red-50 hover:text-red-600 transition-all active:scale-95"
+                      title="Apagar Tudo"
+                    >
+                      <Trash2 className="size-5" />
+                    </Button>
+                  )}
 
                   <Button
                     onClick={() => handleCopy(currentOutput.conteudo)}
