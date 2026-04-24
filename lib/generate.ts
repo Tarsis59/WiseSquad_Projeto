@@ -575,18 +575,23 @@ export async function generateAllFormatsForTheme(temaId: string) {
   const agents: AgentType[] = ["blog", "linkedin", "youtube", "reels", "shorts", "substack"];
   const results: Array<{ success: boolean; [key: string]: unknown }> = [];
 
+  console.log(`[wisesquad.generate] Iniciando geração em massa para tema ${temaId} (${agents.length} agentes)`);
+
   // Processa em batches de 2 para evitar rate limit da API Groq
   // Usa Pollinations URL (instantâneo) para não travar o request
   const batchSize = 2;
   for (let i = 0; i < agents.length; i += batchSize) {
     const batch = agents.slice(i, i + batchSize);
+    console.log(`[wisesquad.generate] Processando batch ${i / batchSize + 1}: ${batch.join(", ")}`);
     const batchResults = await Promise.allSettled(
       batch.map((agent) => generateContentForAgent(agent, { temaId, force: true, useNanoBanana: false }))
     );
     for (const res of batchResults) {
       if (res.status === "fulfilled") {
+        console.log(`[wisesquad.generate] Resultado fulfilled:`, res.value);
         results.push({ success: true, ...res.value });
       } else {
+        console.error(`[wisesquad.generate] Resultado rejected:`, res.reason);
         results.push({ success: false, error: res.reason });
       }
     }
@@ -595,6 +600,8 @@ export async function generateAllFormatsForTheme(temaId: string) {
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
   }
+
+  console.log(`[wisesquad.generate] Geração em massa concluída. ${results.length} resultados, ${results.filter(r => r.success && !r.empty).length} com sucesso`);
 
   // Dispara upgrade de imagens com Nano Banana em background (fire-and-forget)
   upgradeImagesWithNanoBanana(temaId).catch((err) => {
