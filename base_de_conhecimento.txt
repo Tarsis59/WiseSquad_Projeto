@@ -1,0 +1,222 @@
+====================================================================
+BASE DE CONHECIMENTO CORPORATIVA - WISECHATS (PROJETO WISESQUAD)
+VERSÃO ABRIL 2026 — BASEADA NOS PRONTUÁRIOS DE REUNIÕES E PLAYBOOK SPIN
+====================================================================
+
+1. IDENTIDADE E POSICIONAMENTO DA MARCA
+- Nome da Empresa: WiseChats
+- Produto Principal: CDT-CRM (Plataforma de gestão comercial com IA 100% focada e exclusiva para franquias Cartão de Todos - CDT).
+- O que fazemos: Automatizamos processos comerciais, atendimento via WhatsApp 24/7, recuperação de inadimplentes e treinamento de equipe usando Inteligência Artificial especializada, integrada a um CRM visual.
+- Diferencial: Não somos um "chatbot genérico". Nossa IA é treinada com mais de 2.000 conversas reais de vendedores CDT, conhece as objeções da rede, os benefícios da Clínica Amor e Saúde e se adapta ao vocabulário regional de cada franquia. A IA não substitui o vendedor, ela amplifica. A IA qualifica e entrega o lead pronto; o humano foca no fechamento.
+- Diferenciação Competitiva:
+  1. 100% exclusivo para CDT — a IA conhece o produto, os benefícios da Clínica Amor e Saúde, as particularidades de cada região e o vocabulário dos vendedores. Não é um chatbot genérico.
+  2. Não substitui o vendedor — amplifica — a IA faz a triagem, qualifica e entrega o lead pronto para o fechamento humano.
+  3. CRM + IA no mesmo ecossistema — a maioria das unidades usa CRM separado de ferramenta de WhatsApp. No CDT-CRM, tudo está integrado.
+  4. Autoridade: Carlos Eduardo possui 6 anos de experiência com 70 franquias CDT e R$10M+ em gestão de tráfego para a rede.
+  5. Treinamento gamificado com dados reais — o módulo educacional é alimentado com objeções reais dos clientes CDT, não exemplos genéricos.
+  6. Sem fidelidade + sem setup + 50% desconto no primeiro mês — elimina objeção de risco financeiro.
+
+2. STACK TÉCNICA E INFRAESTRUTURA
+- Frontend CRM: Lovable (plataforma no-code/IA)
+- Backend: Supabase (PostgreSQL) — em migração para RDS/AWS com 15.000+ registros
+- Deploy: Vercel + Antigravity
+- IA Conversacional: WiseChats (plataforma proprietária)
+- Monitoramento: Sentry (em implementação)
+- Repositório: GitHub
+- Observação: Base de dados Lovable e WiseChats são separadas, sincronizadas via API. Endpoints de sincronização de visitantes e mensagens em desenvolvimento.
+
+3. PÚBLICO-ALVO E SUAS DORES (ICP)
+- Quem compra: Gestores, Franqueados e Líderes de Vendas das unidades Cartão de Todos (CDT).
+- Perfil do cliente-alvo: gestores e franqueados de unidades CDT que enfrentam:
+  * Baixa performance da equipe (tipicamente só ~30% dos vendedores bate meta regularmente).
+  * Gestão manual de leads por planilha Excel ou WhatsApp pessoal do gestor.
+  * Inadimplência alta sem processo automatizado de recuperação.
+  * Alto custo para treinar novos vendedores (2-3 meses para ficar produtivo).
+  * Sem visibilidade em tempo real das conversas do time.
+  * Sem atendimento fora do horário comercial.
+- Tamanho típico das unidades atendidas: 5 a 20 vendedores ativos; 2.000 a 10.000 inadimplentes na base; 1 a 5 colaboradores de inadimplência/conciliação.
+- Dores Recorrentes Identificadas no Campo (fev/abr 2026):
+  * Distribuição manual de leads — planilha impressa ou WhatsApp do gestor. Conflito entre vendedores, leads perdidos.
+  * Sem atendimento fora do horário — clientes que escrevem à noite ou fim de semana ficam sem resposta.
+  * Inadimplência sem processo — abordagem manual, mensagens genéricas, taxa de resposta baixa.
+  * Treinamento lento — 2 a 3 meses para um vendedor novo ficar produtivo. Alta rotatividade.
+  * Sem visibilidade das conversas — gestor não sabe o que os vendedores falam com os clientes.
+  * Banimento de WhatsApp — disparos em massa sem controle geram bloqueios e perda de número.
+  * Diferenças regionais — Nordeste mais receptivo; São Paulo e Rio de Janeiro mais resistentes. A IA precisa se adaptar.
+
+4. O PRODUTO E SUAS SOLUÇÕES (CDT-CRM)
+4.1 — CRM Conversacional
+- Importação de leads via planilha CSV (limpa, distribui, normaliza automaticamente).
+- Distribuição automática e aleatória de leads entre vendedores — elimina conflito interno e favorecimento.
+- Kanban visual por etapas do funil: primeiro contato → em negociação → agendado → ganho → perdido.
+- Histórico completo de cada lead: mensagens, ligações, status, anotações.
+- Busca avançada por nome, status, unidade, resultado.
+- Multi-atendimento: vários vendedores respondem pelo mesmo número WhatsApp da unidade com visibilidade total do gestor.
+- Alertas para leads sem movimentação há mais de 2 dias.
+- Redistribuição automática de leads parados para outros vendedores.
+
+4.2 — Agentes de IA no WhatsApp (24/7)
+- Agente de Inadimplência: Aborda clientes com pendências, evita termo "dívida", usa "pendência no plano". Gera PIX via CPF automaticamente. Vendedor só finaliza.
+- Vendedor Automatizado: Atende leads inbound, qualifica, tira dúvidas e agenda com vendedor humano. Opera fora do horário comercial.
+- Agente de Retenção: Aborda clientes que sinalizam cancelamento com argumentos e ofertas para reter.
+- Agente de Reativação: Retoma contato com leads frios, cancelados e desfiliados com abordagem personalizada.
+- Capacidade: 20 a 40 contatos diários por número de WhatsApp. Múltiplos números para escalar sem risco de banimento.
+- Protocolo de aquecimento de chips: 7-10 dias usando o WhatsApp progressivamente para evitar banimentos do Meta antes de iniciar campanhas em massa.
+- Pausas automáticas quando cliente demonstra resistência.
+
+4.3 — Dashboard Gerencial em Tempo Real
+- Visitantes únicos na plataforma.
+- Taxa de resposta por campanha.
+- Horários de pico de atendimento.
+- Funil de conversão (visitou → respondeu → atendimento humano → fechou).
+- Performance individual por vendedor.
+- Leads sem movimentação.
+- Volume de mensagens enviadas e recebidas.
+- Taxa de banimento de números.
+
+4.4 — Módulo de Treinamento Gamificado
+- Perguntas baseadas em objeções reais do dia a dia CDT (ex: "não tenho dinheiro agora", "preciso falar com meu marido").
+- Trilhas de aprendizado por área: vendas, inadimplência, retenção.
+- Sistema de certificação com badges.
+- Gestores acompanham evolução de cada vendedor via dashboard.
+- Mentor virtual de vendas com IA: responde dúvidas em tempo real durante atendimentos.
+- Reduz tempo de treinamento de novos vendedores de 2-3 meses para ~15 dias.
+- Scripts prontos para objeções mais comuns.
+- 3 variações de abordagem por situação (direta, empática, neutra).
+- Casos reais de conversões bem-sucedidas de outras unidades CDT.
+
+4.5 — Sugestão de Abordagem por Lead
+- Para cada lead no CRM, a IA gera automaticamente:
+  * Resumo do perfil do cliente (status financeiro, tempo de uso do cartão, histórico).
+  * 3 opções de mensagem pronta para copiar e colar.
+  * Indicação do momento ideal para contato (baseado em histórico de resposta).
+  * Alerta de objeção prevista com sugestão de resposta.
+
+5. ESTRUTURA COMERCIAL E PRECIFICAÇÃO (ROI)
+- Planos e Preços:
+  * Essencial: R$ 1.800/mês (2 agentes IA — foco em inadimplência ou vendas).
+  * Avançado: R$ 3.150/mês (4 agentes IA — inadimplência + vendas). Plano mais adotado.
+  * Premium: R$ 4.500/mês (6 agentes IA — operação completa).
+- Condições comerciais:
+  * Sem taxa de setup.
+  * Sem multa contratual.
+  * Contrato mínimo: 6 meses (aviso prévio de 30 dias para cancelamento).
+  * 2 treinamentos gratuitos para a equipe comercial incluídos no fechamento.
+  * Desconto de 50% no primeiro mês disponível para fechamentos rápidos.
+- O Argumento de Ouro (ROI): 6 agentes IA custam R$ 4.500/mês. 6 vendedores humanos custam cerca de R$ 18.000/mês + encargos. Com a IA: +30% em vendas, operação 24h, zero rotatividade.
+- Autoridade: O especialista Carlos Eduardo possui 6 anos de experiência com CDT e R$ 10M+ em gestão de tráfego para 70 franquias.
+
+6. METODOLOGIA DE VENDAS E TOM DE VOZ
+- Tom de Voz Geral: Profissional, consultivo, empático, firme, dinâmico e orientado a dados. Sorriso na voz (para SDRs) e foco total na dor do cliente, não em "falar de ferramentas".
+- Framework de Vendas (Método SPIN — Neil Rackham):
+  * S (Situação): Entender a estrutura atual (quantos vendedores, como distribuem leads).
+  * P (Problema): Fazer o cliente verbalizar o caos (leads sem resposta, baixa meta). NUNCA afirme uma dor — pergunte por ela.
+  * I (Implicação): Aumentar a dor (quanto custa um lead perdido? qual o impacto na meta semestral?). Perguntas de implicação são "tristes" porque tornam o problema maior e mais urgente.
+  * N (Necessidade de Solução): Fazer o cliente imaginar o cenário ideal ("E se você tivesse visibilidade total?"). Perguntas N são "alegres" porque o cliente verbaliza o valor de resolver — isso cria desejo de compra.
+- Regra de Ouro SDR: O objetivo da SDR NÃO é vender a plataforma, é vender uma REUNIÃO de diagnóstico de 15 minutos. Quem fala mais, perde. Usar prova social hiperespecífica logo na abertura.
+- Estrutura da Reunião — 4 fases: Abertura (2 min) → Situação (5-7 min) → Problema (5-7 min) → Implicação (8-10 min, coração da venda) → Necessidade de Solução (5-7 min, cliente pede a solução) → Demonstração (10 min) → Fechamento (3-5 min).
+- O que NÃO fazer:
+  * Apresentar a solução antes de descobrir as dores.
+  * Fazer muitas perguntas de situação (máximo 4).
+  * Afirmar a dor em vez de perguntar.
+  * Listar funcionalidades sem conectar a dores.
+  * Aceitar objeção de preço sem explorar implicação.
+  * Pedir decisão sem oferecer próximo passo claro.
+- Cheat Sheet SPIN:
+  * SITUAÇÃO → Contexto. Máx. 4 perguntas.
+  * PROBLEMA → "Acontece de...?" / "Como é hoje...?"
+  * IMPLICAÇÃO → "O que isso representa em...?" / "Se continuar assim...?"
+  * NEED-PAYOFF → "Se você conseguisse... como mudaria...?"
+  * DEMO → "Você falou que X — olha como a gente resolve isso..."
+  * FECHAMENTO → Próximo passo específico baseado no perfil do decisor.
+
+7. PLAYBOOK SDR — ROTEIRO DE LIGAÇÃO FRIA
+7.1 Passando pelo Gatekeeper
+- SDR: "Oi, tudo bem? Pode me colocar rapidinho na linha com o [Nome do Decisor]? Quero falar sobre uma solução que vi que pode trazer resultados interessantes para a empresa."
+- Se perguntarem do que se trata: "Sou a [Nome da SDR], da WiseChats. Vi que vocês [mencionar algo específico da empresa] e queria mostrar como empresas do mesmo setor estão respondendo leads em segundos, reativando listas de clientes que geralmente ficam paradas no CRM ou em planilhas, 24h por dia, gastando menos que um colaborador. É coisa de dois minutinhos mesmo."
+
+7.2 Abertura com o Decisor (Geração de Conexão)
+- SDR: "Oi [Nome], tudo bem? Eu sou a [Nome da SDR], da WiseChats. Estou conversando com empresas de [Nicho da empresa] aí de [Cidade] para entender como estão lidando hoje com atendimento e geração de novos negócios."
+- SDR: "A gente tem conseguido resultados bem expressivos para empresas parecidas com a sua — como aumentar em 25% a taxa de conversão em menos de 30 dias. Mas antes de falar disso, queria entender um pouco mais da sua operação. Posso te fazer umas perguntas rápidas? Fica tranquilo que não estou aqui para te vender nada agora."
+
+7.3 Investigação (Aprofundando a Dor)
+- Se o cliente investe em Marketing/Tráfego: "Legal, então vocês já investem em marketing. Hoje, das pessoas que chegam no WhatsApp por causa dos anúncios, você consegue responder todas na hora?"
+- "E aquelas pessoas que param de responder no meio da conversa... vocês têm um processo de follow-up para reativar essa base, ou esse lead acaba esfriando?"
+- (Dica: A SDR deve ouvir atentamente e demonstrar empatia. Ex: "Imagino... é foda mesmo. Tivemos um cliente que dizia que era como enxugar gelo: quanto mais leads chegavam, mais alguns escapavam sem resposta.")
+
+7.4 O Gancho / Apresentação de Valor
+- "Pelo que você me contou, vejo que hoje vocês [repetir a dor: ex. perdem leads por demora de resposta / têm contatos parados]. Isso acaba impactando diretamente no seu faturamento."
+- "O que nós fazemos aqui é ajudar empresas como a sua a automatizar isso e resolver esses problemas. Nossa IA não é um robô de respostas prontas. É uma Inteligência que interage, responde em menos de 1 minuto (dia e noite), qualifica o lead e reativa listas antigas. O humano só entra na hora de fechar."
+
+7.5 Fechamento (Vendendo a Reunião)
+- "Faz total sentido eu te mostrar como a gente pode aplicar esse mesmo processo para o seu negócio. Eu gostaria de agendar uma reunião rápida de 15 minutos com o nosso especialista em IA, onde ele vai te entregar um diagnóstico gratuito sobre o potencial da sua base de leads."
+- "Eu já verifiquei a agenda dele aqui. Qual horário fica melhor pra você amanhã: às 13:00 ou às 15:00?"
+- "Perfeito, qual e-mail posso enviar a confirmação? Lembrando que nesse bate-papo vamos focar 100% em como otimizar seu processo e aumentar vendas sem aumentar equipe."
+
+7.6 Matriz de Quebra de Objeções Rápida
+- "Não tenho tempo agora / Estou ocupado" → "Entendo totalmente. Por isso a reunião é de no máximo 15 minutos — e a ideia é justamente te mostrar como economizar horas de trabalho da sua equipe."
+- "Já usamos outra ferramenta (chatbot)" → "Perfeito! A diferença é que a WiseChats não substitui, ela complementa e potencializa o que vocês já usam, sem retrabalho. Que tal se nós mostrarmos essa diferença pra vocês?"
+- "Não temos orçamento no momento" → "É engraçado você falar isso, porque foi exatamente o que um cliente nosso disse. Hoje ele acha que foi o melhor investimento, porque a nossa solução custa menos que um colaborador e se paga sozinha recuperando as vendas que você perde hoje. Quer ver os números dele em 15 minutinhos?"
+- "Automatizar tira o toque humano" → "Perfeito. A ideia não é tirar o toque humano. A IA tira o repetitivo e mantém o humano onde importa, que é no fechamento e nos casos delicados."
+
+8. PROVAS SOCIAIS E CASOS DE SUCESSO (USE ESTES NÚMEROS NOS CONTEÚDOS)
+- CDT Barueri: 68% de conversão (pagamento) entre os inadimplentes que responderam à IA. 150 inadimplentes contatados, 15 pagamentos realizados na operação inicial. Custo considerado alto para volume de mensagens enviadas — segundo chip ativado para escalar.
+- CDT Irajá: Mais de 500 reativações bem-sucedidas. Projeto "Jumbo" — go live previsto mar/2026. Meta: contatar 300 pessoas, conversão 15% → ~38 clientes, receita ~R$1.254. Plataforma de treinamento gamificada apresentada: reduz capacitação para 2 semanas.
+- Case Externo (Real Up RJ): Reativou 2.500 contatos parados com taxa de conversão de 3% para agendamento.
+- CDT Catanduva: 94 visitantes na plataforma em 7 dias, taxa de resposta 45%. Uma das unidades mais colaborativas. Solicitação de módulo de treinamento específico com objeções reais dos próprios vendedores de Catanduva. Segundo número ativado para escalar prospecção.
+- CDT Indaiatuba: 33 de 63 vendedores ativos no CRM com +30% de produtividade esperado. Distribuição automática de leads, onboarding CRM ativo.
+- CDT Tubarão: Budget de tráfego ~456 leads em fevereiro, conversão 35-40%. Uma das unidades mais avançadas — já na etapa de CRM especializado.
+- CDT Madureira: 6 colaboradores enviando 45.000 mensagens/mês com taxa de conversão de 18%. Redução do tempo de treinamento de novos vendedores de 2-3 meses para ~1 mês via gamificação.
+- CDT Bangu: 836 vendas no último mês, meta ambiciosa de 700 em 19 dias úteis. 231 vendas via marketing e campanhas de reativação. Operação Azeitalk para distribuição de leads e cobrança. 2 números WhatsApp com IA para 20 a 40 clientes/dia.
+- CDT Ilhéus (Ana Carolina): Gestão de 6 franquias via holding. Apenas 30% dos vendedores batem meta. Sem CRM, processo manual. ROI: 6 agentes IA = R$4.500 vs R$18.000 em salários humanos. Aguardando aprovação da holding — alta probabilidade de fechar múltiplas unidades.
+- CDT Montenegro (Mariele): 30% dos vendedores batendo meta. Interesse em distribuição automática de leads e CRM. Planos R$1.800 a R$4.500, 2 treinamentos gratuitos incluídos.
+- CDT Fernandópolis (Geraldo): Contrato fechado. Interesse em inadimplência e vendas. Solução para personalizar comunicação da franquia local.
+- CDT Cícero: 8 colaboradores para 5.000-6.000 inadimplentes. Problemas sérios com banimento de WhatsApp. Estratégia de aquecimento de chips para evitar banimentos. Automação de vendas: expectativa de 600 a 800 leads mensais.
+- CDT Aracaju (Stephanie): 34 franquias no grupo, WiseChats já em 10 delas. Falta de métricas e mensagens genéricas de cobrança. Dashboard de métricas em tempo real apresentado.
+- CDT Fortaleza Centro (Tamyle): 13 conciliadores para ~9.520 clientes — custo operacional muito alto. IA para automatizar 80-90% do processo de negociação.
+- CDT Capibaribe: Sem CRM, sem métricas. Equipe depende de listas impressas — sem acompanhamento digital. CRM com IA para organizar e gerenciar leads.
+- CDT Palmas (Simone): IA personalizada para comunicação regional de Palmas. Multi-atendimento, dashboards, CRM integrado.
+- CDT Sergio (multi-unidades): Representa ou influencia múltiplas franquias CDT. Potencial de fechar múltiplas unidades em bloco. Carlos Eduardo: 6 anos de experiência com CDT, R$10M em gestão de anúncios para 70 franquias.
+- CDT Jaboatão (Júlia): Plataforma educacional gamificada: reduz treinamento de 2-3 meses para ~15 dias. Sistema de certificação e trilhas de aprendizado.
+- CDT São João do Meriti (Filipe): 6 vendedores + 8 conciliadores cadastrados imediatamente. Meta declarada: mínimo 40 contratos/vendedor/mês.
+- CDT Teresina (Gerson): 4 agentes IA para inadimplência + vendas, CRM conversacional. Planos de R$2.700 a R$4.500.
+- Expectativa Geral: Aumento de 30% na produtividade/vendas por vendedor usando a ferramenta.
+
+9. ONBOARDING — PROCESSO DE IMPLEMENTAÇÃO (6 FASES)
+- Fase 1 — Kick-off (Dia 1): Reunião com a equipe da unidade. Levantamento de vocabulário local, objeções, regras de negociação, dados da clínica parceira.
+- Fase 2 — Aquecimento (Dias 1-10): Chips de WhatsApp conectados e aquecidos. Sem disparos ainda.
+- Fase 3 — Desenvolvimento (Dias 3-10): Configuração dos agentes IA com base nos dados coletados. Treinamento com conversas reais da unidade.
+- Fase 4 — Testes (Dias 8-12): Testes internos dos fluxos. Validação de mensagens, objeções, respostas. Ajustes finos.
+- Fase 5 — Go Live (Dia 10-14): Início das campanhas com volume gradual. 15-20 contatos/dia escalando para 40.
+- Fase 6 — Acompanhamento (30 dias): Monitoramento diário. Ajustes em tempo real. Reunião quinzenal com o gestor.
+- Grupo de suporte WhatsApp: Cada unidade tem um grupo dedicado com Allan, Eduardo e equipe de CS para resolução em tempo real de dúvidas, bugs e ajustes de IA.
+
+10. DIFERENCIAÇÃO COMPETITIVA
+- 100% exclusivo para CDT — a IA conhece o produto, benefícios da Clínica Amor e Saúde, particularidades de cada região e vocabulário local. Não é um chatbot genérico.
+- Não substitui o vendedor — amplifica — a IA faz a triagem, qualifica e entrega o lead pronto para o fechamento humano.
+- CRM + IA no mesmo ecossistema — tudo integrado, sem retrabalho.
+- Carlos Eduardo — 6 anos de experiência com 70 franquias CDT, R$10M+ em gestão de anúncios.
+- Treinamento gamificado com dados reais — objeções reais dos clientes CDT, não exemplos genéricos.
+- Sem fidelidade + sem setup + desconto no primeiro mês — baixa barreira de entrada.
+
+11. DORES RECORRENTES IDENTIFICADAS NO CAMPO (FEV/ABR 2026)
+- Distribuição manual de leads — planilha impressa ou WhatsApp do gestor. Conflito entre vendedores, leads perdidos.
+- Sem atendimento fora do horário — clientes que escrevem à noite ou fim de semana ficam sem resposta.
+- Inadimplência sem processo — abordagem manual, mensagens genéricas, taxa de resposta baixa.
+- Treinamento lento — 2 a 3 meses para um vendedor novo ficar produtivo. Alta rotatividade.
+- Sem visibilidade das conversas — gestor não sabe o que os vendedores falam com os clientes.
+- Banimento de WhatsApp — disparos em massa sem controle geram bloqueios e perda de número.
+- Diferenças regionais — Nordeste mais receptivo; São Paulo e Rio de Janeiro mais resistentes.
+
+12. GLOSSÁRIO E TERMOS TÉCNICOS INTERNOS
+- CDT: Cartão de Todos (a franquia cliente).
+- Conciliador: Funcionário da unidade CDT que trabalha na recuperação de inadimplentes.
+- Aquecimento de Chip: Período de 7-10 dias usando o WhatsApp progressivamente para evitar banimentos do Meta antes de iniciar campanhas em massa.
+- Desfiliado: Cliente que cancelou o plano CDT — alvo de campanhas de reativação.
+- Lead: Potencial novo associado ao plano CDT, gerado via tráfego pago ou prospecção ativa.
+- Go Live: Início da operação em produção — campanhas ativas com contatos reais.
+- Holding: Estrutura que controla múltiplas franquias CDT — ex: Ana Carolina de Ilhéus (6 unidades).
+- Plano Avançado: Plano de R$3.150 com 4 agentes IA — o mais adotado.
+- Azeitalk: Plataforma de distribuição de leads e cobrança usada por unidades CDT (competidor/concorrente).
+- Detalc: Sistema de gestão de leads usado internamente por algumas unidades CDT.
+====================================================================
