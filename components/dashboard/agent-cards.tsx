@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Briefcase, Check, Clapperboard, FileText, Film, Image, Loader2, Newspaper, Pencil, Play } from "lucide-react";
+import { Briefcase, Check, Clapperboard, FileText, Film, Image, Loader2, Newspaper, Pencil, Play, Music } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -43,6 +43,13 @@ const agents = [
     description: "Script curto, rápido e pronto para retenção alta.",
     icon: Clapperboard,
     iconWrap: "bg-emerald-50 text-emerald-600",
+  },
+  {
+    id: "tiktok" as const,
+    title: "TikTok",
+    description: "Roteiro viral com gancho, prova social e CTA.",
+    icon: Music,
+    iconWrap: "bg-pink-50 text-pink-600",
   },
   {
     id: "substack" as const,

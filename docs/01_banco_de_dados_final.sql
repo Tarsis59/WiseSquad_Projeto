@@ -55,6 +55,15 @@ create table if not exists public.short_video_scripts (
     created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+create table if not exists public.tiktok_scripts (
+    id bigint generated always as identity primary key,
+    tema_id bigint not null references public.temas(id) on delete cascade,
+    titulo text not null,
+    conteudo text not null,
+    imagem_url text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 create table if not exists public.substack_posts (
     id bigint generated always as identity primary key,
     tema_id bigint not null references public.temas(id) on delete cascade,
@@ -98,6 +107,7 @@ alter table public.linkedin_posts enable row level security;
 alter table public.youtube_scripts enable row level security;
 alter table public.reels_copies enable row level security;
 alter table public.short_video_scripts enable row level security;
+alter table public.tiktok_scripts enable row level security;
 alter table public.substack_posts enable row level security;
 alter table public.agentes_customizados enable row level security;
 alter table public.custom_outputs enable row level security;
@@ -110,6 +120,7 @@ create policy "service_role_full_linkedin_posts" on public.linkedin_posts for al
 create policy "service_role_full_youtube_scripts" on public.youtube_scripts for all to service_role using (true) with check (true);
 create policy "service_role_full_reels_copies" on public.reels_copies for all to service_role using (true) with check (true);
 create policy "service_role_full_short_video_scripts" on public.short_video_scripts for all to service_role using (true) with check (true);
+create policy "service_role_full_tiktok_scripts" on public.tiktok_scripts for all to service_role using (true) with check (true);
 create policy "service_role_full_substack_posts" on public.substack_posts for all to service_role using (true) with check (true);
 create policy "service_role_full_agentes_customizados" on public.agentes_customizados for all to service_role using (true) with check (true);
 create policy "service_role_full_custom_outputs" on public.custom_outputs for all to service_role using (true) with check (true);

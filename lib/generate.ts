@@ -40,6 +40,12 @@ export const agentConfigs: Record<string, AgentConfig> = {
     prompt: (titulo) =>
       `Crie um roteiro de vídeo curto (máximo 60 segundos) para YouTube Shorts sobre o tema "${titulo}". Use o formato Problema -> Agitação -> Solução rápida.`,
   },
+  tiktok: {
+    label: "TikTok",
+    table: "tiktok_scripts",
+    prompt: (titulo) =>
+      `Crie um roteiro completo de vídeo para TikTok (máximo 60 segundos) sobre o tema "${titulo}". Estruture com: 1) Gancho viral (0-3s), 2) Vinheta (3-5s), 3) Problema (5-20s), 4) Solução com WiseChats (20-45s), 5) Prova social (45-50s), 6) CTA claro (50-60s). Inclua instruções visuais (o que aparece na tela), instruções de áudio (música, efeitos), hashtags relevantes e legenda completa. Use tom energético, profissional mas acessível, com provas sociais reais da WiseChats.`,
+  },
   substack: {
     label: "Substack",
     table: "substack_posts",
@@ -572,7 +578,7 @@ REGRAS DE REDAÇÃO:
 }
 
 export async function generateAllFormatsForTheme(temaId: string) {
-  const agents: AgentType[] = ["blog", "linkedin", "youtube", "reels", "shorts", "substack"];
+  const agents: AgentType[] = ["blog", "linkedin", "youtube", "reels", "shorts", "tiktok", "substack"];
   const results: Array<{ success: boolean; [key: string]: unknown }> = [];
 
   console.log(`[wisesquad.generate] Iniciando geração em massa para tema ${temaId} (${agents.length} agentes)`);
@@ -613,7 +619,7 @@ export async function generateAllFormatsForTheme(temaId: string) {
 
 // Atualiza imagens no banco com URLs do Nano Banana (rodando em background)
 async function upgradeImagesWithNanoBanana(temaId: string) {
-  const agents: AgentType[] = ["blog", "linkedin", "youtube", "reels", "shorts", "substack"];
+  const agents: AgentType[] = ["blog", "linkedin", "youtube", "reels", "shorts", "tiktok", "substack"];
 
   for (const agent of agents) {
     try {
@@ -632,7 +638,7 @@ async function upgradeImagesWithNanoBanana(temaId: string) {
 
       const aspectRatioMap: Record<AgentType, string> = {
         blog: "2:1", linkedin: "2:1", youtube: "16:9",
-        reels: "9:16", shorts: "9:16", substack: "2:1",
+        reels: "9:16", shorts: "9:16", tiktok: "9:16", substack: "2:1",
       };
 
       const promptMap: Record<AgentType, string> = {
@@ -641,6 +647,7 @@ async function upgradeImagesWithNanoBanana(temaId: string) {
         youtube: `youtube thumbnail about "${row.titulo}", bold colors, high contrast, modern marketing digital style, professional, no text overlays, 16:9`,
         reels: `instagram reels cover about "${row.titulo}", vibrant vertical social media style, bold modern colors, professional, no text`,
         shorts: `youtube shorts thumbnail about "${row.titulo}", dynamic minimalist style, bold colors, vertical composition, no text`,
+        tiktok: `tiktok viral video cover about "${row.titulo}", energetic vertical social media style, vibrant colors, dynamic composition, trendy aesthetic, no text`,
         substack: `editorial newsletter header about "${row.titulo}", minimalist corporate design, elegant typography, soft background, no text`,
       };
 
@@ -693,17 +700,23 @@ export async function fetchRecentOutputs(limitPerAgent = 5): Promise<GeneratedRe
   const results = await Promise.all(
     (Object.keys(agentConfigs) as AgentType[]).map(async (agent) => {
       const config = agentConfigs[agent];
-      const { data, error } = await supabase
-        .from(config.table)
-        .select("*")
-        .order("id", { ascending: false })
-        .limit(limitPerAgent);
+      try {
+        const { data, error } = await supabase
+          .from(config.table)
+          .select("*")
+          .order("id", { ascending: false })
+          .limit(limitPerAgent);
 
-      if (error) {
-        throw new Error(`Erro ao buscar histórico de ${config.label}: ${error.message}`);
+        if (error) {
+          console.warn(`[wisesquad.fetchRecentOutputs] Tabela ${config.table} não encontrada ou erro: ${error.message}`);
+          return [];
+        }
+
+        return (data ?? []).map((row) => normalizeRecord(agent, row as Record<string, unknown>));
+      } catch (err) {
+        console.warn(`[wisesquad.fetchRecentOutputs] Erro ao buscar histórico de ${config.label}:`, err instanceof Error ? err.message : err);
+        return [];
       }
-
-      return (data ?? []).map((row) => normalizeRecord(agent, row as Record<string, unknown>));
     })
   );
 

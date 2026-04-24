@@ -53,6 +53,15 @@ async function fetchThemeDetail(id: string) {
 
       if (byId && byId.length > 0) {
         record = normalizeRecord(agent, byId[0] as Record<string, unknown>);
+        const agentLabels: Record<string, string> = {
+          blog: "Blog",
+          linkedin: "LinkedIn",
+          youtube: "YouTube",
+          reels: "Reels",
+          shorts: "Shorts",
+          tiktok: "TikTok",
+          substack: "Substack",
+        };
       } else {
         // 2. Fallback: buscar pelo título exato (cura automática)
         const { data: byTitle } = await supabase

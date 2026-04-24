@@ -7,7 +7,7 @@ import type { AgentType } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-const validAgents: AgentType[] = ["blog", "linkedin", "youtube", "reels", "shorts", "substack"];
+const validAgents: AgentType[] = ["blog", "linkedin", "youtube", "reels", "shorts", "tiktok", "substack"];
 
 export async function POST(request: Request) {
   try {
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     // Gerar imagem com Nano Banana
     const aspectRatioMap: Record<AgentType, string> = {
       blog: "2:1", linkedin: "2:1", youtube: "16:9",
-      reels: "9:16", shorts: "9:16", substack: "2:1",
+      reels: "9:16", shorts: "9:16", tiktok: "9:16", substack: "2:1",
     };
 
     const promptMap: Record<AgentType, string> = {
@@ -57,6 +57,7 @@ export async function POST(request: Request) {
       youtube: `youtube thumbnail about "${row.titulo}", bold colors, high contrast, modern marketing digital style, professional, no text overlays, 16:9`,
       reels: `instagram reels cover about "${row.titulo}", vibrant vertical social media style, bold modern colors, professional, no text`,
       shorts: `youtube shorts thumbnail about "${row.titulo}", dynamic minimalist style, bold colors, vertical composition, no text`,
+      tiktok: `tiktok viral video cover about "${row.titulo}", energetic vertical social media style, vibrant colors, dynamic composition, trendy aesthetic, no text`,
       substack: `editorial newsletter header about "${row.titulo}", minimalist corporate design, elegant typography, soft background, no text`,
     };
 

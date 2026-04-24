@@ -32,7 +32,7 @@ interface GenerateResponse {
   tema?: Tema;
 }
 
-const agentsOrder: AgentType[] = ["blog", "linkedin", "youtube", "reels", "shorts", "substack"];
+const agentsOrder: AgentType[] = ["blog", "linkedin", "youtube", "reels", "shorts", "tiktok", "substack"];
 
 function getAgentLabel(agent: AgentType) {
   switch (agent) {

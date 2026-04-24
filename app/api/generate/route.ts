@@ -5,7 +5,7 @@ import type { AgentType } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-const validAgents: AgentType[] = ["blog", "linkedin", "youtube", "reels", "shorts", "substack"];
+const validAgents: AgentType[] = ["blog", "linkedin", "youtube", "reels", "shorts", "tiktok", "substack"];
 
 export async function POST(request: Request) {
   try {
